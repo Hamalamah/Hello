@@ -12,31 +12,31 @@ using namespace std;
 using namespace cv;
 int main(int argc, char *argv[])
 {
-
-if (argc != 5)
-{
-    cout << "Not enough parameters" << endl;
-    return -1;
-}
+    
+    if (argc != 4)
+    {
+        cout << "Not enough parameters" << endl;
+        return -1;
+    }
     
     stringstream conv;
     
     const string source=argv[1];
     int Value, delay;
-    conv << argv[2] << endl << argv[3]<<endl<<argv[4];       // put in the strings
-    conv >> Value >> delay>>redValue;
+    conv << argv[2] << endl << argv[3];       // put in the strings
+    conv >> Value >> delay;
     
     
     char c;
     int frameNum=-1;
-
+    
     VideoCapture capt(source);
     if (!capt.isOpened())
     {
         cout << "Could not open Video"<<source<<endl;
         return -1;
     }
-
+    
     namedWindow("Video",1);
     namedWindow("NewVideo",1);
     Mat frame;
@@ -59,9 +59,12 @@ if (argc != 5)
             {
                 if(frame.at<Vec3b>(y,x)[2]>Value)
                 {
-                   
-                  frame.at<Vec3b>(y,x)[2]=Value/3;
-                
+                    if (x>0 && y>0) {
+                        
+                    
+                    frame.at<Vec3b>(y,x)[2]=(frame.at<Vec3b>(y-1,x-1)[2]+frame.at<Vec3b>(y-1,x)[2]+frame.at<Vec3b>(y,x-1)[2])/3;
+                    }
+                    
                 }
             }
         }
@@ -74,25 +77,25 @@ if (argc != 5)
         SurfFeatureDetector detector(minHessian);
         
         vector<KeyPoint> keypoint;
-        vector<KeyPoint> keypointr;
+        
         
         detector.detect( frame, keypoint);
-        detector.detect( redframe, keypointr);
+       
         
         Mat frame_keypoints;
-        Mat frame_keypointsr;
+       
         
         drawKeypoints(frame,keypoint,frame_keypoints,Scalar::all(-1), DrawMatchesFlags::DEFAULT);
-        drawKeypoints(redframe,keypointr,frame_keypointsr,Scalar::all(-1), DrawMatchesFlags::DEFAULT);
         
-       
-        ///Feature Extractor
+        
+        
+       /* ///Feature Extractor
         SurfDescriptorExtractor extractor;
         
         Mat descriptors, descriptorsr;
         
         extractor.compute( frame, keypoint, descriptors );
-        extractor.compute( redframe, keypointr, descriptorsr );
+        
         ///
         
         ///Flann Based Matcher
@@ -107,7 +110,7 @@ if (argc != 5)
             if( dist < min_dist ) min_dist = dist;
             if( dist > max_dist ) max_dist = dist;
         }
-
+        
         
         std::vector< DMatch > good_matches;
         
@@ -121,10 +124,10 @@ if (argc != 5)
                     good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
                     vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
         
-        ///
+        ///*/
         
         cout<<"Frame: "<<frameNum<<"# "<<endl;
-        imshow( "Good Matches", img_matches );
+        imshow( "Good Matches", frame_keypoints );
         //imshow("Video",frame_keypoints);
         //imshow("NewVideo",frame_keypointsr);
         //imshow("NewVideo",frame_keypointsn);
