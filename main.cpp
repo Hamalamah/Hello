@@ -22,7 +22,7 @@ if (argc != 5)
     stringstream conv;
     
     const string source=argv[1];
-    int Value, delay,redValue;
+    int Value, delay;
     conv << argv[2] << endl << argv[3]<<endl<<argv[4];       // put in the strings
     conv >> Value >> delay>>redValue;
     
@@ -50,43 +50,23 @@ if (argc != 5)
             break;
         }
         ++frameNum;
-       
-        ///RedExtractor
-        redframe=Mat::zeros(frame.size(),frame.type());
-        for( int y = 0; y < redframe.rows; y++ )
-        {
-            for( int x = 0; x < redframe.cols; x++ )
-            {
-                if(frame.at<Vec3b>(y,x)[2]>redValue && frame.at<Vec3b>(y,x)[1]<redValue && frame.at<Vec3b>(y,x)[0]<redValue)
-                {
-                    for( int c = 0; c < 3; c++ )
-                    {
-                        redframe.at<Vec3b>(y,x)[c]=frame.at<Vec3b>(y,x)[c];
-                    }
-                }
-            }
-        }
-
         
         ///specular reflection
-        /*
+        cvtColor( frame, frame, CV_BGR2HSV );
         for( int y = 0; y < frame.rows; y++ )
         {
             for( int x = 0; x < frame.cols; x++ )
             {
-                if(frame.at<Vec3b>(y,x)[0]>Value && frame.at<Vec3b>(y,x)[1]>Value && frame.at<Vec3b>(y,x)[2]>Value)
+                if(frame.at<Vec3b>(y,x)[2]>Value)
                 {
-                    for( int c = 0; c < 3; c++ )
-                    { if(y>0 && x>0)
-                        {
-                            frame.at<Vec3b>(y,x)[c]=(frame.at<Vec3b>(y-1,x-1)[c]+frame.at<Vec3b>(y,x-1)[c]+frame.at<Vec3b>(y-1,x)[c])/3;
-                        }
-                    }
+                   
+                  frame.at<Vec3b>(y,x)[2]=Value/3;
+                
                 }
             }
         }
         
-        */
+        cvtColor(frame,frame,CV_HSV2BGR);
         
         ///Feature Detection
         int minHessian=400;
